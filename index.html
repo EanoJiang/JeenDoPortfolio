@@ -17,6 +17,14 @@
         </nav>
     </header>
 
+    <!-- 全屏浏览按钮 -->
+    <div class="fullscreen-btn-container">
+        <a href="fullscreen-viewer.html" class="fullscreen-btn">
+            <span class="btn-icon">📷</span>
+            <span class="btn-text">全屏浏览</span>
+        </a>
+    </div>
+
     <main>
         <section class="about-section">
             <div class="about-header">
@@ -87,7 +95,7 @@
     <div id="photoModal" class="modal">
         <span class="close">&times;</span>
         <img class="modal-content" id="modalImg">
-        <div class="zoom-hint">使用鼠标滚轮可放大缩小图片 | 放大后可拖动查看不同区域</div>
+        <div class="zoom-hint">使用鼠标滚轮放大缩小 | 放大后按住鼠标拖动查看不同区域 | 松开鼠标停止移动</div>
     </div>
 
     <script src="script.js"></script>

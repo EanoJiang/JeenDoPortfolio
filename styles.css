@@ -365,6 +365,7 @@ footer {
     transition: transform 0.2s ease;
     transform-origin: center;
     user-select: none;
+    cursor: default;
 }
 
 .close {
@@ -420,4 +421,64 @@ footer {
 
 .zoom-hint:hover {
     opacity: 1;
+}
+
+/* 全屏浏览按钮 */
+.fullscreen-btn-container {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+}
+
+.fullscreen-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.fullscreen-btn:hover {
+    background-color: var(--accent-color);
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.btn-text {
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .fullscreen-btn-container {
+        right: 20px;
+        top: auto;
+        bottom: 20px;
+    }
+    
+    .fullscreen-btn {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .btn-icon {
+        font-size: 20px;
+    }
+    
+    .btn-text {
+        font-size: 10px;
+    }
 } 

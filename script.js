@@ -159,6 +159,25 @@ document.addEventListener('DOMContentLoaded', function() {
         modalImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
     }
     
+    // 确保图片始终在视窗中央，不会被拖出视野
+    function constrainPosition() {
+        // 获取图片和模态框的尺寸
+        const imgRect = modalImg.getBoundingClientRect();
+        const modalRect = modal.getBoundingClientRect();
+        
+        // 计算图片缩放后的实际尺寸
+        const scaledWidth = imgRect.width;
+        const scaledHeight = imgRect.height;
+        
+        // 计算图片中心点到模态框中心点的最大距离
+        const maxX = Math.max(0, (scaledWidth - modalRect.width) / 2);
+        const maxY = Math.max(0, (scaledHeight - modalRect.height) / 2);
+        
+        // 限制拖动范围
+        translateX = Math.min(maxX, Math.max(-maxX, translateX));
+        translateY = Math.min(maxY, Math.max(-maxY, translateY));
+    }
+    
     // 关闭模态框
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', function(event) {
@@ -197,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 添加鼠标滚轮事件监听
+    // 更新鼠标滚轮事件
     modal.addEventListener('wheel', function(event) {
         event.preventDefault();
         
@@ -216,7 +235,15 @@ document.addEventListener('DOMContentLoaded', function() {
             scale = Math.max(scale - scaleStep, minScale);
         }
         
-        // 应用缩放
+        // 如果缩小到最小或接近最小比例，重置位置到中心
+        if (scale <= minScale + 0.1) {
+            translateX = 0;
+            translateY = 0;
+        } else {
+            // 缩放后确保图片位置约束
+            constrainPosition();
+        }
+        
         updateTransform();
     });
     
@@ -224,28 +251,48 @@ document.addEventListener('DOMContentLoaded', function() {
     modalImg.addEventListener('mousedown', function(event) {
         // 只有在放大状态才能拖动
         if (scale > 1) {
+            event.preventDefault(); // 防止默认行为
             isDragging = true;
             startX = event.clientX - translateX;
             startY = event.clientY - translateY;
             modalImg.style.cursor = 'grabbing';
+            
+            // 监听鼠标移动事件, 但只在当前拖动过程中有效
+            const handleMouseMove = function(moveEvent) {
+                if (isDragging) {
+                    moveEvent.preventDefault();
+                    translateX = moveEvent.clientX - startX;
+                    translateY = moveEvent.clientY - startY;
+                    
+                    // 确保图片位置约束
+                    constrainPosition();
+                    updateTransform();
+                }
+            };
+            
+            // 监听鼠标释放事件，结束拖动
+            const handleMouseUp = function() {
+                if (isDragging) {
+                    isDragging = false;
+                    modalImg.style.cursor = 'grab';
+                    
+                    // 拖动结束后移除临时事件监听器
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                }
+            };
+            
+            // 添加临时事件监听器
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
         }
     });
     
-    // 鼠标移动事件，实时更新位置
+    // 模态框内拖动处理
     modal.addEventListener('mousemove', function(event) {
-        if (isDragging) {
+        // 只在按下鼠标时移动，这是一个保险措施
+        if (isDragging && scale > 1) {
             event.preventDefault();
-            translateX = event.clientX - startX;
-            translateY = event.clientY - startY;
-            updateTransform();
-        }
-    });
-    
-    // 鼠标释放事件，结束拖动
-    window.addEventListener('mouseup', function() {
-        if (isDragging) {
-            isDragging = false;
-            modalImg.style.cursor = 'grab';
         }
     });
     
@@ -253,12 +300,16 @@ document.addEventListener('DOMContentLoaded', function() {
     modalImg.addEventListener('mouseenter', function() {
         if (scale > 1) {
             modalImg.style.cursor = 'grab';
+        } else {
+            modalImg.style.cursor = 'default';
         }
     });
     
     // 鼠标离开图片区域
     modalImg.addEventListener('mouseleave', function() {
-        modalImg.style.cursor = 'default';
+        if (!isDragging) {
+            modalImg.style.cursor = 'default';
+        }
     });
     
     // ESC键关闭模态框
