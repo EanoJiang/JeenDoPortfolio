@@ -30,6 +30,106 @@ document.addEventListener('DOMContentLoaded', function() {
     // 图片延迟加载状态跟踪
     const loadedImages = new Set();
     
+    // 生成查看器页面
+    function generateViewerPage() {
+        // 创建新的HTML内容
+        let viewerContent = `
+        <!DOCTYPE html>
+        <html lang="zh-CN">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>作品全屏查看</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body {
+                    background-color: #000;
+                    color: #fff;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    overflow-x: hidden;
+                }
+                
+                .viewer-container {
+                    width: 100%;
+                }
+                
+                .image-item {
+                    width: 100%;
+                    min-height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 20px;
+                }
+                
+                .image-item img {
+                    width: 100%;
+                    height: auto;
+                    max-height: 90vh;
+                    object-fit: contain;
+                }
+                
+                .image-title {
+                    margin-top: 20px;
+                    font-size: 1.5rem;
+                    text-align: center;
+                    padding: 10px;
+                }
+                
+                .back-button {
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    background-color: rgba(0,0,0,0.7);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    z-index: 100;
+                }
+                
+                .nav-hints {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    background-color: rgba(0,0,0,0.7);
+                    padding: 10px;
+                    font-size: 14px;
+                }
+            </style>
+        </head>
+        <body>
+            <button class="back-button" onclick="window.close()">返回画廊</button>
+            <div class="viewer-container">`;
+        
+        // 添加所有图片
+        photoData.forEach(photo => {
+            viewerContent += `
+                <div class="image-item">
+                    <img src="${photo.src}" alt="${photo.title}">
+                    <div class="image-title">${photo.title}</div>
+                </div>`;
+        });
+        
+        // 添加底部导航提示和关闭标签
+        viewerContent += `
+            </div>
+            <div class="nav-hints">向下滚动查看更多作品</div>
+        </body>
+        </html>`;
+        
+        return viewerContent;
+    }
+    
     // 动态生成画廊项目
     photoData.forEach((photo, index) => {
         const galleryItem = document.createElement('div');
@@ -49,11 +149,21 @@ document.addEventListener('DOMContentLoaded', function() {
         galleryItem.appendChild(caption);
         gallery.appendChild(galleryItem);
         
-        // 为每个画廊项目添加点击事件，打开模态框
+        // 为每个画廊项目添加点击事件，打开新窗口查看图片
         galleryItem.addEventListener('click', function() {
-            // 点击时才加载原始图片
-            loadOriginalImage(photo.src, function(loadedSrc) {
-                openModal(loadedSrc);
+            // 创建一个Blob对象
+            const blob = new Blob([generateViewerPage()], {type: 'text/html'});
+            const viewerUrl = URL.createObjectURL(blob);
+            
+            // 打开新窗口并传递索引
+            const viewerWindow = window.open(viewerUrl, '_blank');
+            
+            // 在新窗口加载完成后，滚动到当前点击的图片
+            viewerWindow.addEventListener('load', function() {
+                const imageItems = viewerWindow.document.querySelectorAll('.image-item');
+                if (imageItems[index]) {
+                    imageItems[index].scrollIntoView({behavior: 'smooth'});
+                }
             });
         });
         
@@ -104,102 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(imgElement);
     }
     
-    // 加载原始图片函数
-    function loadOriginalImage(src, callback) {
-        // 如果图片已经加载过，直接使用
-        if (loadedImages.has(src)) {
-            callback(src);
-            return;
-        }
-        
-        // 否则新建一个图片对象加载
-        const tempImg = new Image();
-        tempImg.onload = function() {
-            loadedImages.add(src);
-            callback(src);
-        };
-        tempImg.onerror = function() {
-            // 加载失败时使用替代图片
-            callback('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23f44336"/%3E%3Ctext x="50%25" y="50%25" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle"%3E加载失败%3C/text%3E%3C/svg%3E');
-        };
-        tempImg.src = src;
-    }
-    
-    // 获取模态框元素
-    const modal = document.getElementById('photoModal');
-    const modalImg = document.getElementById('modalImg');
-    const closeBtn = document.getElementsByClassName('close')[0];
-    
-    // 图片缩放变量
-    let scale = 1;
-    const scaleStep = 0.1;
-    const minScale = 0.5;
-    const maxScale = 3;
-    
-    // 图片拖动变量
-    let isDragging = false;
-    let startX, startY;
-    let translateX = 0;
-    let translateY = 0;
-    
-    // 打开模态框函数
-    function openModal(imgSrc) {
-        modal.style.display = 'flex';
-        modalImg.src = imgSrc;
-        // 重置缩放比例和位置
-        scale = 1;
-        translateX = 0;
-        translateY = 0;
-        updateTransform();
-        document.body.style.overflow = 'hidden'; // 防止背景滚动
-    }
-    
-    // 更新图片变换
-    function updateTransform() {
-        modalImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-    }
-    
-    // 确保图片始终在视窗中央，不会被拖出视野
-    function constrainPosition() {
-        // 获取图片和模态框的尺寸
-        const imgRect = modalImg.getBoundingClientRect();
-        const modalRect = modal.getBoundingClientRect();
-        
-        // 计算图片缩放后的实际尺寸
-        const scaledWidth = imgRect.width;
-        const scaledHeight = imgRect.height;
-        
-        // 计算图片中心点到模态框中心点的最大距离
-        const maxX = Math.max(0, (scaledWidth - modalRect.width) / 2);
-        const maxY = Math.max(0, (scaledHeight - modalRect.height) / 2);
-        
-        // 限制拖动范围
-        translateX = Math.min(maxX, Math.max(-maxX, translateX));
-        translateY = Math.min(maxY, Math.max(-maxY, translateY));
-    }
-    
-    // 关闭模态框
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-    
-    // 关闭模态框函数
-    function closeModal() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // 恢复背景滚动
-        
-        // 清理模态框中的图片缓存
-        clearImageCache(modalImg);
-        
-        // 重置变量
-        scale = 1;
-        translateX = 0;
-        translateY = 0;
-    }
-    
     // 清理图片缓存的函数
     function clearImageCache(imgElement) {
         if (imgElement && imgElement.src) {
@@ -216,142 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 更新鼠标滚轮事件
-    modal.addEventListener('wheel', function(event) {
-        event.preventDefault();
-        
-        // 确定缩放方向
-        const delta = Math.sign(event.deltaY) * -1;
-        
-        // 记录缩放前的比例
-        const prevScale = scale;
-        
-        // 计算新的缩放比例
-        if (delta > 0) {
-            // 放大
-            scale = Math.min(scale + scaleStep, maxScale);
-        } else {
-            // 缩小
-            scale = Math.max(scale - scaleStep, minScale);
-        }
-        
-        // 如果缩小到最小或接近最小比例，重置位置到中心
-        if (scale <= minScale + 0.1) {
-            translateX = 0;
-            translateY = 0;
-        } else {
-            // 缩放后确保图片位置约束
-            constrainPosition();
-        }
-        
-        updateTransform();
-    });
-    
-    // 鼠标按下事件，开始拖动
-    modalImg.addEventListener('mousedown', function(event) {
-        // 只有在放大状态才能拖动
-        if (scale > 1) {
-            event.preventDefault(); // 防止默认行为
-            isDragging = true;
-            startX = event.clientX - translateX;
-            startY = event.clientY - translateY;
-            modalImg.style.cursor = 'grabbing';
-            
-            // 监听鼠标移动事件, 但只在当前拖动过程中有效
-            const handleMouseMove = function(moveEvent) {
-                if (isDragging) {
-                    moveEvent.preventDefault();
-                    translateX = moveEvent.clientX - startX;
-                    translateY = moveEvent.clientY - startY;
-                    
-                    // 确保图片位置约束
-                    constrainPosition();
-                    updateTransform();
-                }
-            };
-            
-            // 监听鼠标释放事件，结束拖动
-            const handleMouseUp = function() {
-                if (isDragging) {
-                    isDragging = false;
-                    modalImg.style.cursor = 'grab';
-                    
-                    // 拖动结束后移除临时事件监听器
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
-                }
-            };
-            
-            // 添加临时事件监听器
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        }
-    });
-    
-    // 模态框内拖动处理
-    modal.addEventListener('mousemove', function(event) {
-        // 只在按下鼠标时移动，这是一个保险措施
-        if (isDragging && scale > 1) {
-            event.preventDefault();
-        }
-    });
-    
-    // 鼠标进入图片区域，如果已缩放则显示抓取光标
-    modalImg.addEventListener('mouseenter', function() {
-        if (scale > 1) {
-            modalImg.style.cursor = 'grab';
-        } else {
-            modalImg.style.cursor = 'default';
-        }
-    });
-    
-    // 鼠标离开图片区域
-    modalImg.addEventListener('mouseleave', function() {
-        if (!isDragging) {
-            modalImg.style.cursor = 'default';
-        }
-    });
-    
-    // ESC键关闭模态框
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && modal.style.display === 'flex') {
-            closeModal();
-        }
-    });
-    
-    // 页面关闭或刷新前的清理工作
-    window.addEventListener('beforeunload', function() {
-        // 清理加载的图片缓存
-        const galleryImages = document.querySelectorAll('.gallery-img');
-        galleryImages.forEach(img => {
-            clearImageCache(img);
-        });
-        
-        // 清理模态框中的图片
-        clearImageCache(modalImg);
-        
-        // 重置变量
-        scale = 1;
-        translateX = 0;
-        translateY = 0;
-        isDragging = false;
-        
-        // 清空缓存跟踪
-        loadedImages.clear();
-        
-        // 显示缓存已清理的消息
-        showCacheStatus('图片缓存已清理');
-        
-        // 强制浏览器执行垃圾回收（尽管浏览器有自己的垃圾回收机制）
-        if (window.gc) {
-            window.gc();
-        }
-        
-        // 清除所有事件监听器（在实际应用中可能需要更具体的处理）
-        modalImg.onload = null;
-        modalImg.onerror = null;
-    });
-
     // 显示缓存状态信息
     function showCacheStatus(message) {
         const cacheStatus = document.getElementById('cacheStatus');
@@ -365,7 +243,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 2000);
         }
     }
-
+    
+    // 页面关闭或刷新前的清理工作
+    window.addEventListener('beforeunload', function() {
+        // 清理加载的图片缓存
+        const galleryImages = document.querySelectorAll('.gallery-img');
+        galleryImages.forEach(img => {
+            clearImageCache(img);
+        });
+        
+        // 清空缓存跟踪
+        loadedImages.clear();
+        
+        // 显示缓存已清理的消息
+        showCacheStatus('图片缓存已清理');
+        
+        // 强制浏览器执行垃圾回收（尽管浏览器有自己的垃圾回收机制）
+        if (window.gc) {
+            window.gc();
+        }
+    });
+    
     // 当用户离开页面一段时间后再回来，主动清理未使用的缓存
     let pageVisibilityTimer;
     document.addEventListener('visibilitychange', function() {
