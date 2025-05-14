@@ -1,0 +1,6 @@
+@echo off
+echo 正在更新照片数组...
+node generatePhotoList.js
+echo.
+echo 按任意键退出...
+pause > nul 

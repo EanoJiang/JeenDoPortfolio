@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大图展示 - 震东作品集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .fullscreen-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .fullscreen-gallery {
+            width: 100%;
+        }
+        
+        .fullscreen-item {
+            width: 100%;
+            margin-bottom: 0;
+            position: relative;
+        }
+        
+        .fullscreen-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .fullscreen-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 15px;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .fullscreen-item:hover .fullscreen-caption {
+            opacity: 1;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+            display: none;
+        }
+        
+        .loading::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading"></div>
+    <button class="back-button" onclick="window.location.href='index.html'">返回主页</button>
+    
+    <div class="fullscreen-container">
+        <div class="fullscreen-gallery" id="fullscreenGallery"></div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示加载状态
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            // 手动定义照片数组结构
+            const photoData = [
+                { src: 'photo/wtf2024.jpg', title: '超现实视觉 2024' },
+                { src: 'photo/wtf2024(1).jpg', title: '超现实视觉 2024变体' },
+                { src: 'photo/wtf2021.jpg', title: '超现实视觉 2021' },
+                { src: 'photo/wtf 2021.jpg', title: '超现实视觉 2021原版' },
+                { src: 'photo/wtf 2019.jpg', title: '超现实视觉 2019' },
+                { src: 'photo/7.米国声音：利润收割者 1080.jpg', title: '利润收割者' },
+                { src: 'photo/we\'re the boss . (2).jpg', title: '我们是老板' },
+                { src: 'photo/we\'re the boss .SHREDDER.jpg', title: '老板系列：碎纸机' },
+                { src: 'photo/we\'re the boss .lady SHREDDER.jpg', title: '女战士系列' },
+                { src: 'photo/lady soldier choose weapon .jpg', title: '武器选择' },
+                { src: 'photo/lady soldier submashine gun（1）.jpg', title: '女战士：冲锋枪' },
+                { src: 'photo/shredder!.jpg', title: '碎纸机！' },
+                { src: 'photo/7.fucking soldier.jpg', title: '战士系列' },
+                { src: 'photo/6.Mother America fucker.jpg', title: '美国母亲' },
+                { src: 'photo/6.2035.jpg', title: '2035未来视角' },
+                { src: 'photo/5.2035.jpg', title: '2035视角二' },
+                { src: 'photo/4.2035.jpg', title: '2035视角三' },
+                { src: 'photo/3.capital Absorbing assets.jpg', title: '资本吸收资产' },
+                { src: 'photo/2.CNcapital.jpg', title: '中国资本' },
+                { src: 'photo/1.CNcapital.jpg', title: '中国资本二' },
+                { src: 'photo/01.FED hunter.jpg', title: '联邦猎人' },
+                { src: 'photo/7.brain washed bastard.jpg', title: '洗脑系列' },
+                { src: 'photo/everbody wish.jpg', title: '每个人的愿望' },
+                { src: 'photo/7.DEATH MEATL.jpg', title: '死亡金属' },
+                { src: 'photo/0.震东 (3).jpg', title: '个人肖像' }
+            ];
+            
+            try {
+                // 直接使用硬编码的照片数据
+                generateFullscreenGallery(photoData);
+                loading.style.display = 'none';
+            } catch (error) {
+                console.error('生成画廊失败:', error);
+                showErrorMessage('无法生成画廊: ' + error.message);
+                loading.style.display = 'none';
+            }
+            
+            // 显示错误消息
+            function showErrorMessage(message) {
+                const gallery = document.getElementById('fullscreenGallery');
+                gallery.innerHTML = `<div style="text-align: center; padding: 50px; font-size: 18px; color: #f44336;">${message}</div>`;
+            }
+            
+            // 生成全屏画廊
+            function generateFullscreenGallery(photos) {
+                const gallery = document.getElementById('fullscreenGallery');
+                
+                // 清空画廊
+                gallery.innerHTML = '';
+                
+                // 动态生成大图展示
+                photos.forEach((photo, index) => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'fullscreen-item';
+                    
+                    const img = document.createElement('img');
+                    img.className = 'fullscreen-img';
+                    img.alt = photo.title;
+                    img.dataset.src = photo.src;
+                    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23333333"/%3E%3C/svg%3E'; // 加载占位图
+                    
+                    const caption = document.createElement('div');
+                    caption.className = 'fullscreen-caption';
+                    caption.textContent = photo.title;
+                    
+                    galleryItem.appendChild(img);
+                    galleryItem.appendChild(caption);
+                    gallery.appendChild(galleryItem);
+                    
+                    // 使用 Intersection Observer 延迟加载图片
+                    observeImage(img);
+                });
+            }
+            
+            // 使用 Intersection Observer API 实现图片延迟加载
+            function observeImage(imgElement) {
+                const options = {
+                    root: null,
+                    rootMargin: '200px',
+                    threshold: 0.1
+                };
+                
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            
+                            if (src) {
+                                img.src = src;
+                                
+                                // 图片加载成功
+                                img.onload = function() {
+                                    img.classList.add('loaded');
+                                };
+                                
+                                // 图片加载失败
+                                img.onerror = function() {
+                                    console.error('图片加载失败:', src);
+                                    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23f44336"/%3E%3Ctext x="50%25" y="50%25" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle"%3E加载失败%3C/text%3E%3C/svg%3E';
+                                };
+                            }
+                            
+                            // 不再观察这个元素
+                            observer.unobserve(img);
+                        }
+                    });
+                }, options);
+                
+                // 开始观察
+                observer.observe(imgElement);
+            }
+        });
+    </script>
+</body>
+</html> 

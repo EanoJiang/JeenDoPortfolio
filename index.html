@@ -12,6 +12,7 @@
             <div class="logo">KAE JEENDO</div>
             <ul class="nav-links">
                 <li><a href="#" class="active">首页</a></li>
+                <li><a href="fullscreen.html" class="fullscreen-link">大图展示</a></li>
             </ul>
             <div class="settings">⚙️</div>
         </nav>
@@ -36,6 +37,9 @@
 
         <section class="gallery-section">
             <h2>作品展示</h2>
+            <div class="fullscreen-button-container">
+                <a href="fullscreen.html" class="fullscreen-button">查看大图展示 <span class="fullscreen-icon">🖼️</span></a>
+            </div>
             <div class="gallery" id="gallery">
                 <!-- 照片将通过JavaScript动态加载 -->
             </div>
@@ -87,7 +91,8 @@
     <div id="photoModal" class="modal">
         <span class="close">&times;</span>
         <img class="modal-content" id="modalImg">
-        <div class="zoom-hint">使用鼠标滚轮放大缩小 | 放大后按住鼠标拖动查看不同区域 | 松开鼠标停止移动</div>
+        <div class="zoom-hint">使用鼠标滚轮可无限放大查看细节 | 放大后按住鼠标拖动查看不同区域 | 松开鼠标停止移动</div>
+        <div class="zoom-level">100%</div>
     </div>
 
     <script src="script.js"></script>
