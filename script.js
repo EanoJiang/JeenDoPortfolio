@@ -56,10 +56,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalImg = document.getElementById('modalImg');
     const closeBtn = document.getElementsByClassName('close')[0];
     
+    // 图片缩放变量
+    let scale = 1;
+    const scaleStep = 0.1;
+    const minScale = 0.5;
+    const maxScale = 3;
+    
     // 打开模态框函数
     function openModal(imgSrc) {
         modal.style.display = 'flex';
         modalImg.src = imgSrc;
+        // 重置缩放比例
+        scale = 1;
+        modalImg.style.transform = `scale(${scale})`;
         document.body.style.overflow = 'hidden'; // 防止背景滚动
     }
     
@@ -76,6 +85,26 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto'; // 恢复背景滚动
     }
+    
+    // 添加鼠标滚轮事件监听
+    modal.addEventListener('wheel', function(event) {
+        event.preventDefault();
+        
+        // 确定缩放方向
+        const delta = Math.sign(event.deltaY) * -1;
+        
+        // 计算新的缩放比例
+        if (delta > 0) {
+            // 放大
+            scale = Math.min(scale + scaleStep, maxScale);
+        } else {
+            // 缩小
+            scale = Math.max(scale - scaleStep, minScale);
+        }
+        
+        // 应用缩放
+        modalImg.style.transform = `scale(${scale})`;
+    });
     
     // ESC键关闭模态框
     document.addEventListener('keydown', function(event) {

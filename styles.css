@@ -320,6 +320,9 @@ footer {
     height: 100%;
     background-color: rgba(0,0,0,0.9);
     padding: 60px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
 .modal-content {
@@ -328,6 +331,8 @@ footer {
     max-height: 90%;
     margin: auto;
     object-fit: contain;
+    transition: transform 0.2s ease;
+    transform-origin: center;
 }
 
 .close {
@@ -338,6 +343,7 @@ footer {
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 1001;
 }
 
 /* 响应式设计 */
@@ -364,4 +370,22 @@ footer {
     .modal {
         padding: 20px;
     }
+}
+
+.zoom-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #f1f1f1;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.zoom-hint:hover {
+    opacity: 1;
 } 
