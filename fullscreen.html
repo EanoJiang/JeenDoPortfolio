@@ -67,10 +67,12 @@
             position: relative;
             width: 100%;
             min-height: 100vh;
+            padding-top: 80px;
+            padding-bottom: 40px;
         }
         
         .fullscreen-gallery {
-            width: 100%;
+            width: 80%;
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
@@ -81,9 +83,11 @@
             margin-bottom: 60px;
             position: relative;
             border-left: 3px solid var(--silver-color);
+            border-radius: 3px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
             background-color: var(--card-bg);
+            overflow: hidden;
         }
         
         .fullscreen-item:hover {
@@ -184,38 +188,32 @@
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
             
-            // 手动定义照片数组结构
+            // 使用与主页相同的照片数组结构
             const photoData = [
-                // 超现实视觉系列
-                { src: 'photo/wtf 2019.jpg', title: '超现实视觉 2019' },
-                { src: 'photo/wtf 2021.jpg', title: '超现实视觉 2021' },
-                { src: 'photo/wtf2021.jpg', title: '超现实视觉 2021' },
-                { src: 'photo/wtf2024.jpg', title: '超现实视觉 2024' },
-                { src: 'photo/wtf2024(1).jpg', title: '超现实视觉 2024 1' },
-                // 2035未来系列
-                { src: 'photo/4.2035.jpg', title: '2035视角三' },
-                { src: 'photo/5.2035.jpg', title: '2035视角二' },
-                { src: 'photo/6.2035.jpg', title: '2035未来视角' },
-                // 资本系列
-                { src: 'photo/01.FED hunter.jpg', title: '联邦猎人' },
-                { src: 'photo/1.CNcapital.jpg', title: '中国资本二' },
-                { src: 'photo/2.CNcapital.jpg', title: '中国资本' },
-                { src: 'photo/3.capital Absorbing assets.jpg', title: '资本吸收资产' },
-                { src: 'photo/7.米国声音：利润收割者 1080.jpg', title: '利润收割者' },
-                // 老板系列
-                { src: 'photo/shredder!.jpg', title: '碎纸机！' },
-                { src: 'photo/we\'re the boss . (2).jpg', title: '我们是老板' },
-                { src: 'photo/we\'re the boss .lady SHREDDER.jpg', title: '女战士系列' },
-                { src: 'photo/we\'re the boss .SHREDDER.jpg', title: '老板系列：碎纸机' },
-                // 战士系列
-                { src: 'photo/6.Mother America fucker.jpg', title: '美国母亲' },
-                { src: 'photo/7.fucking soldier.jpg', title: '战士系列' },
-                { src: 'photo/lady soldier choose weapon .jpg', title: '武器选择' },
-                { src: 'photo/lady soldier submashine gun（1）.jpg', title: '女战士：冲锋枪' },
-                // 其他作品
-                { src: 'photo/7.brain washed bastard.jpg', title: '洗脑系列' },
-                { src: 'photo/7.DEATH MEATL.jpg', title: '死亡金属' },
-                { src: 'photo/everbody wish.jpg', title: '每个人的愿望' }
+                { src: 'photo/1.jpg', title: '1' },
+                { src: 'photo/2.jpg', title: '2' },
+                { src: 'photo/3.jpg', title: '3' },
+                { src: 'photo/4.jpg', title: '4' },
+                { src: 'photo/5.jpg', title: '5' },
+                { src: 'photo/6.jpg', title: '6' },
+                { src: 'photo/7.jpg', title: '7' },
+                { src: 'photo/8.jpg', title: '8' },
+                { src: 'photo/9.jpg', title: '9' },
+                { src: 'photo/10.jpg', title: '10' },
+                { src: 'photo/11.jpg', title: '11' },
+                { src: 'photo/12.jpg', title: '12' },
+                { src: 'photo/13.jpg', title: '13' },
+                { src: 'photo/14.jpg', title: '14' },
+                { src: 'photo/15.jpg', title: '15' },
+                { src: 'photo/16.jpg', title: '16' },
+                { src: 'photo/17.jpg', title: '17' },
+                { src: 'photo/18.jpg', title: '18' },
+                { src: 'photo/19.jpg', title: '19' },
+                { src: 'photo/20.jpg', title: '20' },
+                { src: 'photo/21.jpg', title: '21' },
+                { src: 'photo/22.jpg', title: '22' },
+                { src: 'photo/23.jpg', title: '23' },
+                { src: 'photo/24.jpg', title: '24' },
             ];
             
             try {
