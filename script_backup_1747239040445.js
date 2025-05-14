@@ -1,4 +1,4 @@
-// 此代码由自动脚本生成于 2025/5/15 00:12:24
+// 此代码由自动脚本生成于 2025/5/15 00:05:32
 document.addEventListener('DOMContentLoaded', function() {
     // 照片数据数组
     const photoData = [
@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
         { src: 'photo/7.米国声音：利润收割者 1080.jpg', title: '米国声音：利润收割者 1080' },
         // 老板系列
         { src: 'photo/shredder!.jpg', title: '碎纸机!' },
-        { src: 'photo/we\'re the boss . (2).jpg', title: '我们是老板    2' },
-        { src: 'photo/we\'re the boss .lady SHREDDER.jpg', title: '我们是老板  lady 碎纸机' },
-        { src: 'photo/we\'re the boss .SHREDDER.jpg', title: '我们是老板  碎纸机' },
+        { src: 'photo/we're the boss . (2).jpg', title: '我们是老板    2' },
+        { src: 'photo/we're the boss .lady SHREDDER.jpg', title: '我们是老板  lady 碎纸机' },
+        { src: 'photo/we're the boss .SHREDDER.jpg', title: '我们是老板  碎纸机' },
         // 战士系列
         { src: 'photo/6.Mother America fucker.jpg', title: 'Mother America fucker' },
         { src: 'photo/7.fucking soldier.jpg', title: 'fucking 战士' },
@@ -34,8 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
         { src: 'photo/7.DEATH MEATL.jpg', title: '死亡金属' },
         { src: 'photo/everbody wish.jpg', title: 'everbody wish' },
     ];
-
-
 
 
     // 获取画廊容器
@@ -142,5 +140,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // 获取模态框元素
     const modal = document.getElementById('photoModal');
     const modalImg = document.getElementById('modalImg');
-    const closeBtn = document.getElementsByClassName('close')[0];
-});
+    const closeBtn = document.getElementsByClassName('close')[0

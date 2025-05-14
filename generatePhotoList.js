@@ -52,10 +52,15 @@ function getPhotoFiles() {
         const files = fs.readdirSync(photoDir);
         
         // 过滤出图片文件
-        return files.filter(file => {
+        const imageFiles = files.filter(file => {
             const ext = path.extname(file).toLowerCase();
             return ['.jpg', '.jpeg', '.png', '.gif'].includes(ext);
         });
+        
+        // 按文件名排序
+        imageFiles.sort((a, b) => a.localeCompare(b));
+        
+        return imageFiles;
     } catch (error) {
         console.error('无法读取照片目录:', error.message);
         return [];
@@ -88,8 +93,14 @@ function generatePhotoArray() {
         const title = generateTitle(photo);
         groupedPhotos[group].push({
             src: `photo/${photo}`,
-            title: title
+            title: title,
+            filename: photo // 保存原始文件名用于排序
         });
+    });
+    
+    // 确保每个分组内的照片也按文件名排序
+    Object.keys(groupedPhotos).forEach(group => {
+        groupedPhotos[group].sort((a, b) => a.filename.localeCompare(b.filename));
     });
     
     return groupedPhotos;
@@ -109,8 +120,13 @@ function generateCode() {
         if (photos.length > 0) {
             code += `        // ${groupName}\n`;
             photos.forEach(photo => {
-                code += `        { src: '${photo.src}', title: '${photo.title}' },\n`;
-                allPhotos.push(photo);
+                // 处理可能包含单引号的文件名
+                const safeFilename = photo.src.replace(/'/g, "\\'");
+                code += `        { src: '${safeFilename}', title: '${photo.title}' },\n`;
+                allPhotos.push({
+                    src: photo.src,
+                    title: photo.title
+                });
             });
         }
     });

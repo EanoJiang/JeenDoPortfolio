@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>作品集展示</title>
+    <title>震东作品集</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.cdnfonts.com/css/cyberpunk" rel="stylesheet">
 </head>
 <body>
+    <div class="cyber-grid"></div>
+    <div class="glitch-overlay"></div>
+    
     <header>
         <nav>
             <div class="logo">KAE JEENDO</div>
@@ -14,84 +18,42 @@
                 <li><a href="#" class="active">首页</a></li>
                 <li><a href="fullscreen.html" class="fullscreen-link">大图展示</a></li>
             </ul>
-            <div class="settings">⚙️</div>
         </nav>
     </header>
 
     <main>
         <section class="about-section">
+            <div class="glitch-line"></div>
             <div class="about-header">
-                <span class="tag">关于我</span>
-                <h1>你好，我是震东 👋</h1>
-                <p class="intro">热衷于艺术创作的视觉设计师，来自中国，
-                通过独特的视觉语言推动艺术边界，创造沉浸式视觉体验。</p>
-            </div>
-            <div class="mission">
-                <span class="mission-icon">🚀</span>
-                <h3>我的使命</h3>
-                <p>连接艺术与现实的桥梁：让创意与功能相遇，
-                让创新驱动进步。</p>
-                <p class="motto"><em>不断前行，永不停歇。</em> 🚀</p>
+                <span class="tag">游戏原画 </span>
+                <p class="intro"></p>
+                <div style="height: 450px;"></div>
+                <h1 class="cyber-text">震东 <span class="highlight">JEENDO></h1>
             </div>
         </section>
-
-        <section class="gallery-section">
-            <h2>作品展示</h2>
-            <div class="fullscreen-button-container">
-                <a href="fullscreen.html" class="fullscreen-button">查看大图展示 <span class="fullscreen-icon">🖼️</span></a>
-            </div>
-            <div class="gallery" id="gallery">
-                <!-- 照片将通过JavaScript动态加载 -->
-            </div>
-        </section>
-
-        <section class="about-me">
-            <div class="about-content">
-                <h2>关于我</h2>
-                <p>我从事艺术创作已有5年，始于2019年。最初，我学习了基本的绘画和设计技巧，逐渐发展出独特的个人风格。</p>
-                <p>我的首个项目是一系列数字艺术作品，探索现代社会议题。</p>
-                <p>随着技术的发展，我开始专注于数字媒体艺术，结合传统元素与现代表达方式。</p>
-                <div class="action-buttons">
-                    <a href="#" class="btn primary">查看我的作品集 &rarr;</a>
-                    <a href="#" class="btn secondary">联系我 &rarr;</a>
-                </div>
-            </div>
-
-            <div class="studio-info">
-                <div class="studio-header">
-                    <span class="code-icon">&#60;/&#62;</span>
-                    <h3>我的工作室</h3>
-                </div>
-                <p class="studio-desc">我的作品集不仅仅是展示，更是一扇窗口，
-                通向我的世界，在那里激情与目标相遇。
-                探索我的作品。</p>
-                <a href="#" class="download-btn">下载简历</a>
-
-                <div class="skills">
-                    <div class="skill-card">
-                        <span class="skill-icon">🎨</span>
-                        <h4>视觉设计</h4>
-                        <p>创作具有冲击力的视觉作品，注重细节与整体效果。</p>
-                    </div>
-                    <div class="skill-card">
-                        <span class="skill-icon">🖌️</span>
-                        <h4>数字艺术</h4>
-                        <p>打造现代、直观的视觉语言，创造令人难忘的体验。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        
+        <div class="fullscreen-button-container">
+            <a href="fullscreen.html" class="fullscreen-button">
+                查看大图展示 
+                <span class="fullscreen-icon"></span>
+                <span class="button-glow"></span>
+            </a>
+        </div>
+        
+        <div class="gallery" id="gallery">
+            <!-- 照片将通过JavaScript动态加载 -->
+        </div>
     </main>
 
     <footer>
-        <p>&copy; 2024 震东作品集 | 保留所有权利</p>
+        <p>&copy; 戴震东作品集 | 保留所有权利</p>
     </footer>
 
     <!-- 照片查看器模态框 -->
     <div id="photoModal" class="modal">
         <span class="close">&times;</span>
         <img class="modal-content" id="modalImg">
-        <div class="zoom-hint">使用鼠标滚轮可无限放大查看细节 | 放大后按住鼠标拖动查看不同区域 | 松开鼠标停止移动</div>
+        <div class="zoom-hint">使用鼠标滚轮以放大 | 放大后按住鼠标拖动查看不同区域</div>
         <div class="zoom-level">100%</div>
     </div>
 

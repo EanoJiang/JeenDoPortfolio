@@ -1,4 +1,4 @@
-// 此代码由自动脚本生成于 2025/5/15 00:12:24
+// 此代码由自动脚本生成于 2025/5/15 00:10:40
 document.addEventListener('DOMContentLoaded', function() {
     // 照片数据数组
     const photoData = [
@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
         { src: 'photo/7.DEATH MEATL.jpg', title: '死亡金属' },
         { src: 'photo/everbody wish.jpg', title: 'everbody wish' },
     ];
-
 
 
 
