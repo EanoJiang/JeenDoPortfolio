@@ -36,7 +36,6 @@
 
         <section class="gallery-section">
             <h2>作品展示</h2>
-            <div class="gallery-info">点击任意作品可在新页面全屏查看，并可向下滚动浏览所有作品</div>
             <div class="gallery" id="gallery">
                 <!-- 照片将通过JavaScript动态加载 -->
             </div>
@@ -83,10 +82,17 @@
     <footer>
         <p>&copy; 2024 震东作品集 | 保留所有权利</p>
     </footer>
+
+    <!-- 照片查看器模态框 -->
+    <div id="photoModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+        <div class="zoom-hint">使用鼠标滚轮放大缩小 | 放大后按住鼠标拖动查看不同区域 | 松开鼠标停止移动</div>
+    </div>
+
+    <script src="script.js"></script>
     
     <!-- 缓存状态信息 -->
     <div class="cache-status" id="cacheStatus">图片缓存已清理</div>
-
-    <script src="script.js"></script>
 </body>
 </html> 

@@ -140,18 +140,9 @@ main {
 }
 
 .gallery-section h2 {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     text-align: center;
     font-size: 2rem;
-}
-
-.gallery-info {
-    text-align: center;
-    color: var(--secondary-color);
-    margin-bottom: 2rem;
-    padding: 0.5rem;
-    background-color: rgba(0,0,0,0.05);
-    border-radius: 5px;
 }
 
 .gallery {
@@ -347,6 +338,45 @@ footer {
     text-align: center;
     padding: 1.5rem;
     margin-top: 4rem;
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    padding: 60px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.modal-content {
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    margin: auto;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+    transform-origin: center;
+    user-select: none;
+    cursor: default;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
 }
 
 /* 响应式设计 */
