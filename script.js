@@ -1,42 +1,32 @@
-// 此代码由自动脚本生成于 2025/5/15 00:12:24
+// 此代码由自动脚本生成于 2025/5/15 01:00:30
 document.addEventListener('DOMContentLoaded', function() {
     // 照片数据数组
     const photoData = [
-        // 超现实视觉系列
-        { src: 'photo/wtf 2019.jpg', title: '超现实视觉 2019' },
-        { src: 'photo/wtf 2021.jpg', title: '超现实视觉 2021' },
-        { src: 'photo/wtf2021.jpg', title: '超现实视觉 2021' },
-        { src: 'photo/wtf2024.jpg', title: '超现实视觉 2024' },
-        { src: 'photo/wtf2024(1).jpg', title: '超现实视觉 2024 1' },
-        // 2035未来系列
-        { src: 'photo/4.2035.jpg', title: '2035' },
-        { src: 'photo/5.2035.jpg', title: '2035' },
-        { src: 'photo/6.2035.jpg', title: '2035' },
-        // 资本系列
-        { src: 'photo/01.FED hunter.jpg', title: '联邦猎人' },
-        { src: 'photo/1.CNcapital.jpg', title: '中国资本' },
-        { src: 'photo/2.CNcapital.jpg', title: '中国资本' },
-        { src: 'photo/3.capital Absorbing assets.jpg', title: '资本 Absorbing assets' },
-        { src: 'photo/7.米国声音：利润收割者 1080.jpg', title: '米国声音：利润收割者 1080' },
-        // 老板系列
-        { src: 'photo/shredder!.jpg', title: '碎纸机!' },
-        { src: 'photo/we\'re the boss . (2).jpg', title: '我们是老板    2' },
-        { src: 'photo/we\'re the boss .lady SHREDDER.jpg', title: '我们是老板  lady 碎纸机' },
-        { src: 'photo/we\'re the boss .SHREDDER.jpg', title: '我们是老板  碎纸机' },
-        // 战士系列
-        { src: 'photo/6.Mother America fucker.jpg', title: 'Mother America fucker' },
-        { src: 'photo/7.fucking soldier.jpg', title: 'fucking 战士' },
-        { src: 'photo/lady soldier choose weapon .jpg', title: 'lady 战士 choose 武器' },
-        { src: 'photo/lady soldier submashine gun（1）.jpg', title: 'lady 战士 冲锋枪（1）' },
-        // 其他作品
-        { src: 'photo/0.震东 (3).jpg', title: '震东  3' },
-        { src: 'photo/7.brain washed bastard.jpg', title: '洗脑 bastard' },
-        { src: 'photo/7.DEATH MEATL.jpg', title: '死亡金属' },
-        { src: 'photo/everbody wish.jpg', title: 'everbody wish' },
+        { src: 'photo/1.jpg', title: '1' },
+        { src: 'photo/2.jpg', title: '2' },
+        { src: 'photo/3.jpg', title: '3' },
+        { src: 'photo/4.jpg', title: '4' },
+        { src: 'photo/5.jpg', title: '5' },
+        { src: 'photo/6.jpg', title: '6' },
+        { src: 'photo/7.jpg', title: '7' },
+        { src: 'photo/8.jpg', title: '8' },
+        { src: 'photo/9.jpg', title: '9' },
+        { src: 'photo/10.jpg', title: '10' },
+        { src: 'photo/11.jpg', title: '11' },
+        { src: 'photo/12.jpg', title: '12' },
+        { src: 'photo/13.jpg', title: '13' },
+        { src: 'photo/14.jpg', title: '14' },
+        { src: 'photo/15.jpg', title: '15' },
+        { src: 'photo/16.jpg', title: '16' },
+        { src: 'photo/17.jpg', title: '17' },
+        { src: 'photo/18.jpg', title: '18' },
+        { src: 'photo/19.jpg', title: '19' },
+        { src: 'photo/20.jpg', title: '20' },
+        { src: 'photo/21.jpg', title: '21' },
+        { src: 'photo/22.jpg', title: '22' },
+        { src: 'photo/23.jpg', title: '23' },
+        { src: 'photo/24.jpg', title: '24' },
     ];
-
-
-
 
     // 获取画廊容器
     const gallery = document.getElementById('gallery');
@@ -143,4 +133,111 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('photoModal');
     const modalImg = document.getElementById('modalImg');
     const closeBtn = document.getElementsByClassName('close')[0];
+    
+    // 打开模态框
+    function openModal(imgSrc) {
+        modal.style.display = 'flex';
+        modalImg.src = imgSrc;
+        document.body.classList.add('modal-open');
+        
+        // 重置缩放级别
+        modalImg.style.transform = 'scale(1)';
+        modalImg.style.top = '0';
+        modalImg.style.left = '0';
+        document.querySelector('.zoom-level').textContent = '100%';
+    }
+    
+    // 关闭模态框
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    };
+    
+    // 点击模态框背景也关闭模态框
+    modal.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    };
+    
+    // 模态框中的图片缩放功能
+    let scale = 1;
+    let isDragging = false;
+    let startX, startY, translateX = 0, translateY = 0;
+    
+    // 鼠标滚轮缩放
+    modal.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        const newScale = Math.max(1, Math.min(3, scale + delta));
+        
+        if (scale !== newScale) {
+            scale = newScale;
+            
+            // 只有当放大时才能拖动
+            if (scale > 1) {
+                modalImg.classList.add('zoomable');
+            } else {
+                modalImg.classList.remove('zoomable');
+                translateX = 0;
+                translateY = 0;
+            }
+            
+            // 更新变换
+            updateTransform();
+            
+            // 更新缩放级别显示
+            document.querySelector('.zoom-level').textContent = Math.round(scale * 100) + '%';
+        }
+    });
+    
+    // 鼠标拖动功能
+    modalImg.addEventListener('mousedown', function(e) {
+        if (scale > 1) {
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            modalImg.style.cursor = 'grabbing';
+        }
+    });
+    
+    modal.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            const maxTranslate = 100 * (scale - 1);
+            translateX = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientX - startX));
+            translateY = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientY - startY));
+            updateTransform();
+        }
+    });
+    
+    modal.addEventListener('mouseup', function() {
+        if (isDragging) {
+            isDragging = false;
+            modalImg.style.cursor = scale > 1 ? 'grab' : 'auto';
+        }
+    });
+    
+    modal.addEventListener('mouseleave', function() {
+        if (isDragging) {
+            isDragging = false;
+            modalImg.style.cursor = scale > 1 ? 'grab' : 'auto';
+        }
+    });
+    
+    // 更新图片变换
+    function updateTransform() {
+        modalImg.style.transform = `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`;
+    }
+    
+    // 键盘控制
+    document.addEventListener('keydown', function(e) {
+        if (modal.style.display === 'flex') {
+            if (e.key === 'Escape') {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            }
+        }
+    });
 });
