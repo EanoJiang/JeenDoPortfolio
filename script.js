@@ -145,6 +145,11 @@ document.addEventListener('DOMContentLoaded', function() {
         modalImg.style.top = '0';
         modalImg.style.left = '0';
         document.querySelector('.zoom-level').textContent = '100%';
+        
+        // 重置拖动状态
+        isDragging = false;
+        translateX = 0;
+        translateY = 0;
     }
     
     // 关闭模态框
@@ -193,42 +198,80 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 鼠标拖动功能
-    modalImg.addEventListener('mousedown', function(e) {
-        if (scale > 1) {
-            isDragging = true;
-            startX = e.clientX - translateX;
-            startY = e.clientY - translateY;
-            modalImg.style.cursor = 'grabbing';
-        }
-    });
+    // 鼠标拖动逻辑优化：
+    // 1. 将事件处理移动到一个对象，方便管理和移除
+    // 2. 使用requestAnimationFrame优化性能
+    // 3. 确保松开鼠标时停止拖动
     
-    modal.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-            const maxTranslate = 100 * (scale - 1);
-            translateX = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientX - startX));
-            translateY = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientY - startY));
-            updateTransform();
+    const dragHandlers = {
+        // 开始拖动
+        mouseDown: function(e) {
+            if (scale > 1) {
+                e.preventDefault(); // 防止拖动图片时浏览器的默认行为
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                modalImg.style.cursor = 'grabbing';
+                
+                // 立即添加document级别的事件监听器
+                document.addEventListener('mousemove', dragHandlers.mouseMove, { passive: false });
+                document.addEventListener('mouseup', dragHandlers.mouseUp);
+                
+                // 添加额外的保障措施，确保拖动状态能被正确重置
+                window.addEventListener('blur', dragHandlers.stopDragging);
+                document.addEventListener('mouseleave', dragHandlers.stopDragging);
+            }
+        },
+        
+        // 拖动中
+        mouseMove: function(e) {
+            if (!isDragging) return; // 确保只有在isDragging为true时才处理
+            
+            e.preventDefault(); // 阻止默认行为，防止拖动过程中选择文本等
+            
+            // 使用requestAnimationFrame优化性能，减少拖动延迟
+            requestAnimationFrame(() => {
+                if (!isDragging) return; // 再次检查，防止拖动状态在动画帧之间被更改
+                
+                const maxTranslate = 100 * (scale - 1);
+                translateX = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientX - startX));
+                translateY = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientY - startY));
+                updateTransform();
+            });
+        },
+        
+        // 结束拖动
+        mouseUp: function(e) {
+            dragHandlers.stopDragging();
+        },
+        
+        // 停止拖动的通用方法，确保所有事件都能触发停止
+        stopDragging: function() {
+            if (isDragging) {
+                isDragging = false;
+                modalImg.style.cursor = scale > 1 ? 'grab' : 'auto';
+                
+                // 移除所有事件监听器
+                document.removeEventListener('mousemove', dragHandlers.mouseMove, { passive: false });
+                document.removeEventListener('mouseup', dragHandlers.mouseUp);
+                window.removeEventListener('blur', dragHandlers.stopDragging);
+                document.removeEventListener('mouseleave', dragHandlers.stopDragging);
+            }
         }
-    });
+    };
     
-    modal.addEventListener('mouseup', function() {
-        if (isDragging) {
-            isDragging = false;
-            modalImg.style.cursor = scale > 1 ? 'grab' : 'auto';
-        }
-    });
+    // 只在图片上添加mousedown事件，其他事件在document级别处理
+    modalImg.addEventListener('mousedown', dragHandlers.mouseDown);
     
-    modal.addEventListener('mouseleave', function() {
-        if (isDragging) {
-            isDragging = false;
-            modalImg.style.cursor = scale > 1 ? 'grab' : 'auto';
-        }
-    });
-    
-    // 更新图片变换
+    // 更新图片变换 - 使用translate3d触发GPU加速
     function updateTransform() {
-        modalImg.style.transform = `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`;
+        if (!isDragging && scale === 1) {
+            // 如果不在拖动状态且缩放为1，重置变换
+            translateX = 0;
+            translateY = 0;
+        }
+        
+        modalImg.style.transform = `scale(${scale}) translate3d(${translateX / scale}px, ${translateY / scale}px, 0)`;
     }
     
     // 键盘控制
