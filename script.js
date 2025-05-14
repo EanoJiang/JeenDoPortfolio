@@ -62,14 +62,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const minScale = 0.5;
     const maxScale = 3;
     
+    // 图片拖动变量
+    let isDragging = false;
+    let startX, startY;
+    let translateX = 0;
+    let translateY = 0;
+    
     // 打开模态框函数
     function openModal(imgSrc) {
         modal.style.display = 'flex';
         modalImg.src = imgSrc;
-        // 重置缩放比例
+        // 重置缩放比例和位置
         scale = 1;
-        modalImg.style.transform = `scale(${scale})`;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
         document.body.style.overflow = 'hidden'; // 防止背景滚动
+    }
+    
+    // 更新图片变换
+    function updateTransform() {
+        modalImg.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
     }
     
     // 关闭模态框
@@ -93,6 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // 确定缩放方向
         const delta = Math.sign(event.deltaY) * -1;
         
+        // 记录缩放前的比例
+        const prevScale = scale;
+        
         // 计算新的缩放比例
         if (delta > 0) {
             // 放大
@@ -103,7 +119,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // 应用缩放
-        modalImg.style.transform = `scale(${scale})`;
+        updateTransform();
+    });
+    
+    // 鼠标按下事件，开始拖动
+    modalImg.addEventListener('mousedown', function(event) {
+        // 只有在放大状态才能拖动
+        if (scale > 1) {
+            isDragging = true;
+            startX = event.clientX - translateX;
+            startY = event.clientY - translateY;
+            modalImg.style.cursor = 'grabbing';
+        }
+    });
+    
+    // 鼠标移动事件，实时更新位置
+    modal.addEventListener('mousemove', function(event) {
+        if (isDragging) {
+            event.preventDefault();
+            translateX = event.clientX - startX;
+            translateY = event.clientY - startY;
+            updateTransform();
+        }
+    });
+    
+    // 鼠标释放事件，结束拖动
+    window.addEventListener('mouseup', function() {
+        if (isDragging) {
+            isDragging = false;
+            modalImg.style.cursor = 'grab';
+        }
+    });
+    
+    // 鼠标进入图片区域，如果已缩放则显示抓取光标
+    modalImg.addEventListener('mouseenter', function() {
+        if (scale > 1) {
+            modalImg.style.cursor = 'grab';
+        }
+    });
+    
+    // 鼠标离开图片区域
+    modalImg.addEventListener('mouseleave', function() {
+        modalImg.style.cursor = 'default';
     });
     
     // ESC键关闭模态框

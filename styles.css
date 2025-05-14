@@ -333,6 +333,7 @@ footer {
     object-fit: contain;
     transition: transform 0.2s ease;
     transform-origin: center;
+    user-select: none;
 }
 
 .close {
