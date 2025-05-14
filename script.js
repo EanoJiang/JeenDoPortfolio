@@ -234,10 +234,36 @@ document.addEventListener('DOMContentLoaded', function() {
             requestAnimationFrame(() => {
                 if (!isDragging) return; // 再次检查，防止拖动状态在动画帧之间被更改
                 
-                // 根据缩放比例调整最大拖动范围
-                const maxTranslate = 100 * (scale - 1);
-                translateX = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientX - startX));
-                translateY = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientY - startY));
+                // 计算新的位置
+                const newTranslateX = e.clientX - startX;
+                const newTranslateY = e.clientY - startY;
+                
+                // 获取图片和视窗的尺寸
+                const imgRect = modalImg.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                
+                // 计算缩放后的图片尺寸
+                const scaledWidth = imgRect.width * scale;
+                const scaledHeight = imgRect.height * scale;
+                
+                // 计算允许的最大拖动距离（确保图片不会完全拖出视窗）
+                const maxX = (scaledWidth - viewportWidth) / 2 + 100; // 添加一些余量
+                const maxY = (scaledHeight - viewportHeight) / 2 + 100;
+                
+                // 应用拖动限制，但只在图片大于视窗时
+                if (scaledWidth > viewportWidth) {
+                    translateX = Math.min(maxX, Math.max(-maxX, newTranslateX));
+                } else {
+                    translateX = newTranslateX;
+                }
+                
+                if (scaledHeight > viewportHeight) {
+                    translateY = Math.min(maxY, Math.max(-maxY, newTranslateY));
+                } else {
+                    translateY = newTranslateY;
+                }
+                
                 updateTransform();
             });
         },
@@ -272,13 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
             translateX = 0;
             translateY = 0;
         }
-        
-        // 随着放大比例增加，增加最大可拖动范围
-        const maxTranslate = 100 * (scale - 1);
-        
-        // 确保拖动不超出最大范围
-        translateX = Math.min(maxTranslate, Math.max(-maxTranslate, translateX));
-        translateY = Math.min(maxTranslate, Math.max(-maxTranslate, translateY));
         
         modalImg.style.transform = `scale(${scale}) translate3d(${translateX / scale}px, ${translateY / scale}px, 0)`;
     }
