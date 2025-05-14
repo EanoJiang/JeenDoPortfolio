@@ -176,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const delta = e.deltaY > 0 ? -0.1 : 0.1;
-        const newScale = Math.max(1, Math.min(3, scale + delta));
+        // 移除最大缩放限制，只保留最小值为1
+        const newScale = Math.max(1, scale + delta);
         
         if (scale !== newScale) {
             scale = newScale;
@@ -233,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
             requestAnimationFrame(() => {
                 if (!isDragging) return; // 再次检查，防止拖动状态在动画帧之间被更改
                 
+                // 根据缩放比例调整最大拖动范围
                 const maxTranslate = 100 * (scale - 1);
                 translateX = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientX - startX));
                 translateY = Math.min(maxTranslate, Math.max(-maxTranslate, e.clientY - startY));
@@ -270,6 +272,13 @@ document.addEventListener('DOMContentLoaded', function() {
             translateX = 0;
             translateY = 0;
         }
+        
+        // 随着放大比例增加，增加最大可拖动范围
+        const maxTranslate = 100 * (scale - 1);
+        
+        // 确保拖动不超出最大范围
+        translateX = Math.min(maxTranslate, Math.max(-maxTranslate, translateX));
+        translateY = Math.min(maxTranslate, Math.max(-maxTranslate, translateY));
         
         modalImg.style.transform = `scale(${scale}) translate3d(${translateX / scale}px, ${translateY / scale}px, 0)`;
     }
