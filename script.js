@@ -27,15 +27,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // 获取画廊容器
     const gallery = document.getElementById('gallery');
     
+    // 图片延迟加载状态跟踪
+    const loadedImages = new Set();
+    
     // 动态生成画廊项目
-    photoData.forEach(photo => {
+    photoData.forEach((photo, index) => {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
         
         const img = document.createElement('img');
-        img.src = photo.src;
-        img.alt = photo.title;
         img.className = 'gallery-img';
+        img.alt = photo.title;
+        img.dataset.src = photo.src; // 使用data属性存储真实地址
+        img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23cccccc"/%3E%3C/svg%3E'; // 加载占位图
         
         const caption = document.createElement('div');
         caption.className = 'gallery-caption';
@@ -47,9 +51,79 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 为每个画廊项目添加点击事件，打开模态框
         galleryItem.addEventListener('click', function() {
-            openModal(photo.src);
+            // 点击时才加载原始图片
+            loadOriginalImage(photo.src, function(loadedSrc) {
+                openModal(loadedSrc);
+            });
         });
+        
+        // 添加到延迟加载观察队列
+        observeImage(img, index);
     });
+    
+    // 使用 Intersection Observer API 实现图片延迟加载
+    function observeImage(imgElement, delay) {
+        const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 延迟加载，根据索引计算延迟时间
+                    setTimeout(() => {
+                        const img = entry.target;
+                        const src = img.dataset.src;
+                        
+                        if (src && !loadedImages.has(src)) {
+                            img.src = src;
+                            loadedImages.add(src);
+                            
+                            // 图片加载成功
+                            img.onload = function() {
+                                img.classList.add('loaded');
+                            };
+                            
+                            // 图片加载失败
+                            img.onerror = function() {
+                                // 加载失败时使用替代图片
+                                img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23f44336"/%3E%3Ctext x="50%25" y="50%25" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle"%3E加载失败%3C/text%3E%3C/svg%3E';
+                            };
+                        }
+                        
+                        // 不再观察这个元素
+                        observer.unobserve(img);
+                    }, delay * 100); // 逐个延迟加载，避免同时请求过多
+                }
+            });
+        }, options);
+        
+        // 开始观察
+        observer.observe(imgElement);
+    }
+    
+    // 加载原始图片函数
+    function loadOriginalImage(src, callback) {
+        // 如果图片已经加载过，直接使用
+        if (loadedImages.has(src)) {
+            callback(src);
+            return;
+        }
+        
+        // 否则新建一个图片对象加载
+        const tempImg = new Image();
+        tempImg.onload = function() {
+            loadedImages.add(src);
+            callback(src);
+        };
+        tempImg.onerror = function() {
+            // 加载失败时使用替代图片
+            callback('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23f44336"/%3E%3Ctext x="50%25" y="50%25" fill="%23ffffff" text-anchor="middle" dominant-baseline="middle"%3E加载失败%3C/text%3E%3C/svg%3E');
+        };
+        tempImg.src = src;
+    }
     
     // 获取模态框元素
     const modal = document.getElementById('photoModal');
@@ -97,6 +171,30 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto'; // 恢复背景滚动
+        
+        // 清理模态框中的图片缓存
+        clearImageCache(modalImg);
+        
+        // 重置变量
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+    }
+    
+    // 清理图片缓存的函数
+    function clearImageCache(imgElement) {
+        if (imgElement && imgElement.src) {
+            // 创建一个新的空白图片URL来替换当前URL
+            const blankData = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            
+            // 先将图片指向一个1x1的透明gif，这有助于释放原始图片的内存
+            imgElement.src = blankData;
+            
+            // 然后完全移除src属性
+            setTimeout(() => {
+                imgElement.removeAttribute('src');
+            }, 100);
+        }
     }
     
     // 添加鼠标滚轮事件监听
@@ -167,6 +265,82 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && modal.style.display === 'flex') {
             closeModal();
+        }
+    });
+    
+    // 页面关闭或刷新前的清理工作
+    window.addEventListener('beforeunload', function() {
+        // 清理加载的图片缓存
+        const galleryImages = document.querySelectorAll('.gallery-img');
+        galleryImages.forEach(img => {
+            clearImageCache(img);
+        });
+        
+        // 清理模态框中的图片
+        clearImageCache(modalImg);
+        
+        // 重置变量
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        isDragging = false;
+        
+        // 清空缓存跟踪
+        loadedImages.clear();
+        
+        // 显示缓存已清理的消息
+        showCacheStatus('图片缓存已清理');
+        
+        // 强制浏览器执行垃圾回收（尽管浏览器有自己的垃圾回收机制）
+        if (window.gc) {
+            window.gc();
+        }
+        
+        // 清除所有事件监听器（在实际应用中可能需要更具体的处理）
+        modalImg.onload = null;
+        modalImg.onerror = null;
+    });
+
+    // 显示缓存状态信息
+    function showCacheStatus(message) {
+        const cacheStatus = document.getElementById('cacheStatus');
+        if (cacheStatus) {
+            cacheStatus.textContent = message;
+            cacheStatus.style.display = 'block';
+            
+            // 2秒后自动隐藏
+            setTimeout(() => {
+                cacheStatus.style.display = 'none';
+            }, 2000);
+        }
+    }
+
+    // 当用户离开页面一段时间后再回来，主动清理未使用的缓存
+    let pageVisibilityTimer;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            // 页面隐藏（用户切换到其他标签页或最小化浏览器）
+            pageVisibilityTimer = setTimeout(() => {
+                // 超过10分钟未使用，清理部分缓存
+                const unusedImages = [];
+                loadedImages.forEach(src => {
+                    if (!document.querySelector(`img[src="${src}"]`)) {
+                        unusedImages.push(src);
+                    }
+                });
+                
+                // 从缓存集合中移除未使用的图片
+                unusedImages.forEach(src => {
+                    loadedImages.delete(src);
+                });
+                
+                if (unusedImages.length > 0) {
+                    showCacheStatus(`已清理${unusedImages.length}张未使用的图片缓存`);
+                }
+            }, 10 * 60 * 1000); // 10分钟
+        } else {
+            // 页面可见（用户回到本页面）
+            clearTimeout(pageVisibilityTimer);
         }
     });
 }); 
